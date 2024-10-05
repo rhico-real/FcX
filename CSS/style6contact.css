@@ -21,7 +21,7 @@ body {
 
 header {
     background-color: transparent;
-    background-image: url("MainH.jpg");
+    background-image: url("fiber.jpg");
     background-repeat: no-repeat;
     background-size: cover;
     color: #fff;
@@ -67,7 +67,6 @@ nav ul {
     align-items: center;
     padding: 0;
     list-style: none;
-    position: relative; /* Ensure dropdown positioning works */
 }
 
 nav ul li {
@@ -116,6 +115,7 @@ header .header-text {
     padding: 20px; /* Add padding for spacing */
 }
 
+/* Responsive design */
 @media (max-width: 768px) {
     .header-text h2 {
         font-size: 1.5em; /* Adjust font size for smaller screens */
@@ -225,6 +225,8 @@ nav ul li a, nav ul li.dropdown .dropbtn {
     background-color: none;
 }
 
+/*Section1*/
+
 section {
     padding: 2rem 0;
 }
@@ -232,51 +234,45 @@ section {
 /*Home Section*/
 
 #home {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center align items */
     background-color: transparent;
-    padding: 60px 0;
+    padding: 30px 0;
+    font-size: 18px;
 }
 
 .home-content {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 .home-text {
-    max-width: 800px;
-    margin-bottom: 2rem;
-    font-size: 20px;
+    flex: 1 1 60%; /* Takes 60% of the width */
+    padding: 20px;
 }
 
-.home-services ul {
-    list-style-type: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+@media (max-width: 768px) {
+    .home-content {
+        flex-direction: column; /* Stack elements on smaller screens */
+    }
+
+    .home-text {
+        flex: 1 1 100%; /* Full width on small screens */
+    }
+
+    .home-text h2 {
+        font-size: 1.5em; /* Adjust font size for smaller screens */
+    }
+
+    .home-text p {
+        font-size: 1em; /* Adjust font size for smaller screens */
+    }    
+
 }
 
-.home-services li {
-    margin: 0.5rem 0;
-    width: 100%; /* Adjust width to prevent overflow */
-    padding: 0%;
-}
-
-.home-services a {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    background-color: #C8C8C8;
-    color: black;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.home-services a:hover {
-    background-color: #0056b3;
-    color: whitesmoke;
-}
+/*Sizing of screens*/
 
 @media (min-width: 768px) {
     .home-content {
@@ -292,27 +288,6 @@ section {
         margin-bottom: 0;
     }
 
-    .home-services {
-        flex: 1;
-    }
-
-    .home-services ul {
-        align-items: flex-start;
-    }
-}
-
-.service-text {
-    text-align: center;
-    padding: 20px 0;
-}
-
-.service-text p {
-    font-weight: bold;
-    font-size: 1.2em;
-    font-family: Arial, sans-serif;
-    color: black;
-    text-decoration: underline #26619C 1.5px;
-    
 }
 
 @media (max-width: 768px) {
@@ -320,28 +295,79 @@ section {
         flex-direction: column;
     }
     
+    .home-text {
+        padding-right: 0;
+        margin-bottom: 20px;
+        flex: 0 0 100%;
+        width: 800px;
+        margin: 0 auto;
+    }
+}
+
+@media (min-width: 480px) {
+    .home-content {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .home-text {
+        flex: 1;
+        margin-right: 2rem;
+        margin-bottom: 0;
+    }
+
+}
+
+@media (max-width: 480px) {
     .home-content {
         flex-direction: column;
-    }
-    
-    .home-text, .home-services {
-        flex: 0 0 100%;
     }
     
     .home-text {
         padding-right: 0;
         margin-bottom: 20px;
+        flex: 0 0 100%;
+        width: 800px;
+        margin: 0 auto;
     }
 }
 
 section .container {
-    width: 80%;
+    width: 55%;
     margin: 0 auto;
     max-width: 100%; /* Ensure container does not exceed viewport width */
 }
 
-.service {
-    margin-bottom: 1.5rem;
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form label {
+    margin-top: 1rem;
+}
+
+form input, form textarea {
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+form button {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #004d99;
+    color: #fff;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #003d7a;
 }
 
 /*Footer Section*/
@@ -396,84 +422,15 @@ footer .container {
     }
 }
 
-/*Latest News Section*/
-
-#latestNews {
-    background-color: whitesmoke;
-    padding: 50px 0;
-}
-
-#latestNews h2 {
-    text-align: center;
-    color: #333;
-    font-size: 2.5em;
-    margin-bottom: 30px;
-    position: relative;
-}
-
-#latestNews h2::after {
-    content: '';
-    display: block;
-    width: 50px;
-    height: 3px;
-    background-color: #007bff;
-    margin: 15px auto 0;
-}
-
-.news-grid {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    max-width: 100%; /* Ensure grid does not exceed viewport width */
-}
-
-.news-item {
-    flex-basis: calc(33.333% - 20px);
-    margin-bottom: 30px;
-}
-
-@media (max-width: 768px) {
-    .news-item {
-        flex-basis: 100%;
+@media (max-width: 480px) {
+    footer .container {
+        flex-direction: column;
     }
-}
 
-.news-image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
-
-.news-item h3 {
-    font-size: 1.2em;
-    color: #333;
-    margin: 15px 20px 10px;
-}
-
-.news-item p {
-    font-size: 0.9em;
-    color: #666;
-    margin: 0 20px 15px;
-}
-
-.read-more {
-    display: inline-block;
-    background-color: #007bff;
-    color: #fff;
-    text-decoration: none;
-    padding: 8px 15px;
-    border-radius: 4px;
-    margin: 0 20px 20px;
-    transition: background-color 0.3s ease;
-}
-
-.read-more:hover {
-    background-color: #0056b3;
-}
-
-@media (max-width: 768px) {
-    .news-grid {
-        grid-template-columns: 1fr;
+    .footer-left, .footer-center, .footer-right {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 20px;
     }
 }
 

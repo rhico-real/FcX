@@ -7,7 +7,7 @@ html, body {
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     margin: 0;
     padding: 0;
     color: #333;
@@ -558,7 +558,7 @@ footer {
     padding: 1rem 0;
     color: whitesmoke;
     text-align: center;
-    height: 40vh;
+    height: auto;
     display: flex;
     flex-direction: column;
     font-family: Arial, sans-serif;
@@ -601,4 +601,45 @@ footer .container {
         text-align: center;
         margin-bottom: 20px;
     }
+}
+
+/* CSS for responsive navigation */
+.menu-toggle {
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.bar {
+    height: 3px;
+    width: 25px;
+    background-color: #333;
+    margin: 3px 0;
+}
+
+/* Show the menu toggle on smaller screens */
+@media (max-width: 768px) {
+    .nav-list {
+        display: none; /* Hide the menu by default */
+        flex-direction: column;
+        width: 100%;
+        background-color: white; /* Background color for dropdown */
+    }
+
+    .nav-list.active {
+        display: flex; /* Show the menu when active */
+    }
+
+    .menu-toggle {
+        display: flex; /* Show the hamburger icon */
+    }
+}
+
+/* Dropdown content styling */
+.dropdown-content {
+    display: none; /* Hide dropdown by default */
+}
+
+.dropdown:hover .dropdown-content {
+    display: block; /* Show dropdown on hover */
 }
