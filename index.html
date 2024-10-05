@@ -9,6 +9,8 @@
     <link rel="icon" href="images/FiberIco.png" type= "image/x-icon">
     <link rel="stylesheet" href="CSS/style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="Jscript/Script.js"></script>
+    <script src="Jscript/Navyr.js"></script>
 
 </head>
 <body>
@@ -19,7 +21,13 @@
                 <h1>FcX Fiber Solutions</h1>
             </div>
             <nav>
-                <ul>
+                <div class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+                <ul class="nav-list">
                     <li><a href="index.html">Home</a></li>
                     <li class="dropdown">
                         <a href="#services" class="dropbtn">Our Services</a>
@@ -27,11 +35,10 @@
                             <a href="designengineering.html">Design & Engineering</a>
                             <a href="network-deployment.html">Network Deployment</a>
                             <a href="microtrenching.html">Microtrenching</a>
-                            <a href="#ProjectManagement">Project Management</a>
                         </div>
                     </li>
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
                 </ul>
             </nav>
             <div class="header-text">
@@ -54,7 +61,6 @@
                     <li><a href="designengineering.html">Design & Engineering</a></li>
                     <li><a href="network-deployment.html">Network Deployment</a></li>
                     <li><a href="microtrenching.html">Microtrenching</a></li>
-                    <li><a href="#ProjectManagement">Project Management</a></li>
                 </ul>
             </div>
         </div>
@@ -103,10 +109,10 @@
                 <h3>Quick Links</h3>
                 
                 
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#services">Our Services</a></li>
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#">Our Services</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
                 
             </div>
             <div class="footer-right">
@@ -114,25 +120,11 @@
                 <p>123 Fiber Lane, Network City, FC 45678</p>
                 <p>Email: contact@fcxfiber.com</p>
                 <p>Phone: (123) 456-7890</p>
-                <p><a href="https://www.linkedin.com" target="_blank">Connect with us on LinkedIn</a></p>
+                <p>Connect with us on LinkedIn</p>
+                <a href="https://www.linkedin.com" target="_blank"><img src="images/linkedin.png" alt="linkedin" class="logo"></a>
                 <p>&copy; <span id="currentYear"></span> FcX Fiber Solutions. All rights reserved.</p>
             </div>
         </div>
     </footer>
-
-    <script>
-        $(document).ready(function() {
-            // Smooth scrolling for navigation links
-            $('a[href^="#"]').on('click', function(event) {
-                event.preventDefault();
-                $('html, body').animate({
-                    scrollTop: $($.attr(this, 'href')).offset().top
-                }, 800);
-            });
-
-            // Dynamic copyright year
-            $('#currentYear').text(new Date().getFullYear());
-        });
-    </script>
 </body>
 </html>
