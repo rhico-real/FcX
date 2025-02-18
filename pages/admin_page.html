@@ -24,7 +24,7 @@
 
     <script>
         // Fetch all users and populate the table
-        fetch('/api/auth/users')
+        fetch('/api/users')
             .then(response => response.json())
             .then(users => {
                 const tableBody = document.getElementById('usersTable').getElementsByTagName('tbody')[0];
@@ -75,7 +75,7 @@
             .catch(error => console.error('Error fetching users:', error));
 
         function updateUser(userId, newName, newEmail) {
-            fetch(`/api/auth/users/${userId}`, {
+            fetch(`/api/users/${userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -92,7 +92,7 @@
 
         function deleteUser(userId) {
             if (confirm("Are you sure you want to delete this user?")) {
-                fetch(`/api/auth/users/${userId}`, {
+                fetch(`/api/users/${userId}`, {
                     method: 'DELETE',
                 })
                 .then(response => response.json())
