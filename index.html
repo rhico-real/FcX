@@ -516,6 +516,7 @@
                   } else {
                      alert("Login Success!");
                      $("#loginmodal").modal("hide");
+                     window.location.href = "pages/admin_page.html";
                   }
                })
                .catch(error => console.error("Error:", error));
