@@ -8,6 +8,8 @@
 </head>
 <body>
     <h1>Admin Page</h1>
+    <button id="logoutBtn">Logout</button>
+    <button id="backtohome">Back to Home</button>
     <h2>All Users</h2>
     <table id="usersTable">
         <thead>
@@ -23,6 +25,21 @@
     </table>
 
     <script>
+        // Check if the token is in the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (token) {
+            localStorage.setItem('token', token); // Store the token in local storage
+        } else {
+            var usedToken = localStorage.getItem('token');
+
+            if(!usedToken){
+                alert("Unauthenticated")
+                window.location.href = '/';
+            }
+        }
+
         // Fetch all users and populate the table
         fetch('/api/users')
             .then(response => response.json())
@@ -103,6 +120,15 @@
                 .catch(error => console.error('Error deleting user:', error));
             }
         }
+        
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem('token');
+            window.location.href = '/';
+        });
+
+        document.getElementById('backtohome').addEventListener('click', function() {
+            window.location.href = '/';
+        });
     </script>
 </body>
 </html>
