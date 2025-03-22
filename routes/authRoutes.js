@@ -68,6 +68,17 @@ router.get("/users", async (req, res) => {
   }
 });
 
+// Get User by ID
+router.get("/users/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    console.log(user);
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // Update User
 router.put("/users/:id", async (req, res) => {
   try {

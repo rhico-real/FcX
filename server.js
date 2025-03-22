@@ -41,8 +41,7 @@ app.get('/auth/google', passport.authenticate('google', {
 
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
   const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-  
-  res.redirect(`http://localhost:5000/pages/admin_page.html?token=${token}`);
+  res.redirect(`http://localhost:5000/pages/admin_page.html?token=${token}&id=${req.user._id}`);
 });
 
 app.use("/api/auth", authRoutes);
