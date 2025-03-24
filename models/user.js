@@ -9,7 +9,8 @@ const UserSchema = new mongoose.Schema({
   contact: {type: String},
   billingAddress: {type: String},
   plan: {type: String},
-  status: {type: Boolean}
+  status: {type: Boolean},
+  photo: {type: String}
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", UserSchema);

@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile Page</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -62,6 +63,8 @@
             box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
         }
     </style>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div style="display: flex; gap: 10px; margin-bottom: 20px;">
@@ -108,9 +111,85 @@
         </div>
         <button id="updateBtn">Update Profile</button>
     </div>
+    <div class="profile-container">
+        <h2>Profile Information</h2>
+        <div class="profile-item">
+            <label class="label">Profile Photo:</label>
+            <input type="file" id="photoUpload" accept="image/jpeg,image/jpg,image/png">
+            <button id="uploadPhotoBtn" style="margin-top: 10px;">Upload Photo</button>
+            <img id="profileImage" src="" alt="Profile Picture" style="max-width: 200px; margin-top: 10px; display: none;">
+        </div>
+    </div>
 
     <script>
+        const supabaseUrl = 'https://ohoyulauwjfysjmhqxot.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ob3l1bGF1d2pmeXNqbWhxeG90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTgwNDIsImV4cCI6MjA1ODM5NDA0Mn0.vRg2eB5PwHlwNR-imKn7urcEtP8A7hFNqIrzziC7jLQ'
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey)
+
         $(document).ready(async function() {
+            $("#uploadPhotoBtn").click(async function() {
+                const fileInput = document.getElementById('photoUpload');
+                const file = fileInput.files[0];
+                const userId = localStorage.getItem("id");
+                
+                if (!file) {
+                    alert('Please select a file first!');
+                    return;
+                }
+
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Only JPEG, JPG, and PNG files are allowed!');
+                    return;
+                }
+
+                // Validate file size (5MB = 5 * 1024 * 1024 bytes)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB!');
+                    return;
+                }
+
+                try {
+                    // Upload file to Supabase Storage
+                    const fileName = `${userId}_${Date.now()}_${file.name}`;
+                    const { data, error } = await supabase.storage
+                        .from('image')
+                        .upload(`profile_photos/${fileName}`, file, {
+                            cacheControl: '3600',
+                            upsert: true
+                        });
+
+                    if (error) throw error;
+
+                    // Get the public URL for the uploaded file
+                    const { data: { publicUrl } } = supabase.storage
+                        .from('image')
+                        .getPublicUrl(`profile_photos/${fileName}`);
+
+                    // Display the uploaded image
+                    const profileImage = document.getElementById('profileImage');
+                    profileImage.src = publicUrl;
+                    profileImage.style.display = 'block';
+
+                    // Update the user profile with the photo URL
+                    const response = await fetch(`/api/users/${userId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            photoURL: publicUrl
+                        }),
+                    });
+
+                    if (!response.ok) throw new Error("Failed to update profile with photo URL");
+                    alert('Photo uploaded successfully!');
+
+                } catch (error) {
+                    console.error('Error:', error.message);
+                    alert('Error uploading file: ' + error.message);
+                }
+            });
+
             const userId = localStorage.getItem("id");
             if (!userId) {
                 alert("User ID not found!");
@@ -177,5 +256,222 @@
             });
         });
     </script>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            max-width: 500px;
+            background-color: #f4f4f4;
+        }
+        .profile-container {
+            background: white;
+            padding: 20px 60px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .profile-item {
+            margin-bottom: 15px;
+        }
+        .label {
+            font-weight: bold;
+            display: block;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .profile-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        #previewImage {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            margin-bottom: 10px;
+            border: 2px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile-container">
+        <h2>Profile Information</h2>
+
+        <div class="profile-image">
+            <img id="previewImage" src="https://placehold.co/150x150" alt="Profile Photo">
+            <input type="file" id="photoInput" accept="image/*">
+            <button id="uploadPhotoBtn">Upload Photo</button>
+        </div>
+
+        <div class="profile-item">
+            <label class="label">Full Name:</label>
+            <input type="text" id="name">
+        </div>
+        <div class="profile-item">
+            <label class="label">Account Number:</label>
+            <input type="text" id="accountNumber">
+        </div>
+        <div class="profile-item">
+            <label class="label">Email:</label>
+            <input type="email" id="email" disabled>
+        </div>
+        <div class="profile-item">
+            <label class="label">Contact:</label>
+            <input type="text" id="contact">
+        </div>
+        <div class="profile-item">
+            <label class="label">Billing Address:</label>
+            <input type="text" id="billingAddress">
+        </div>
+        <div class="profile-item">
+            <label class="label">Plan:</label>
+            <select id="plan">
+                <option value="999">999</option>
+                <option value="1999">1999</option>
+            </select>
+        </div>
+        <div class="profile-item">
+            <label class="label">Status:</label>
+            <select id="status">
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+            </select>
+        </div>
+        <button id="updateBtn">Update Profile</button>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:5000/api";
+
+        $(document).ready(async function () {
+            const userId = localStorage.getItem("id");
+
+            if (!userId) {
+                alert("User ID not found!");
+                return;
+            }
+
+            // Fetch user details
+            try {
+                const response = await fetch(`${API_URL}/users/${userId}`);
+                if (!response.ok) throw new Error("Failed to fetch user");
+                const user = await response.json();
+
+                $("#name").val(user.name);
+                $("#accountNumber").val(user.accountNumber);
+                $("#email").val(user.email);
+                $("#contact").val(user.contact);
+                $("#billingAddress").val(user.billingAddress);
+                $("#plan").val(user.plan ? user.plan.toString() : "999");
+                $("#status").val(user.status !== undefined ? user.status.toString() : "true");
+
+                if (user.photo) {
+                    $("#previewImage").attr("src", user.photo);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Error loading user data.");
+            }
+
+            // Update user details
+            $("#updateBtn").click(async function () {
+                const updatedUser = {
+                    name: $("#name").val(),
+                    accountNumber: $("#accountNumber").val(),
+                    contact: $("#contact").val(),
+                    billingAddress: $("#billingAddress").val(),
+                    plan: $("#plan").val(),
+                    status: $("#status").val() === "true"
+                };
+
+                try {
+                    const response = await fetch(`${API_URL}/users/${userId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(updatedUser),
+                    });
+
+                    if (!response.ok) throw new Error("Update failed");
+                    alert("Profile updated successfully!");
+                } catch (error) {
+                    console.error(error);
+                    alert("Error updating profile.");
+                }
+            });
+
+            // Handle image preview
+            $("#photoInput").change(function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $("#previewImage").attr("src", e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Upload profile photo
+            $("#uploadPhotoBtn").click(async function () {
+                const fileInput = document.querySelector("#photoInput"); // Ensure this matches your input's ID
+                if (!fileInput || !fileInput.files.length) {
+                    console.error("No file selected");
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append("file", fileInput.files[0]); // Append the first file
+                formData.append("userId", userId);
+
+                try {
+                    console.log(formData);
+                    console.log([...formData.entries()]);
+                    const response = await fetch(`${API_URL}/upload-photo`, {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) throw new Error(result.error || "Upload failed");
+
+                    $("#previewImage").attr("src", result.photoURL);
+                    alert("Photo uploaded successfully!");
+                } catch (error) {
+                    console.error(error);
+                    alert("Error uploading photo.");
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>
