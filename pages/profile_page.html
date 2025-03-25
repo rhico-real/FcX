@@ -321,10 +321,15 @@
     </style>
 </head>
 <body>
+    <div>
+        <button id="logoutBtn">Logout</button>
+        <button id="backtohome">Back to Home</button>
+        <button id="gotodashboard">Go to Dashboard</button>
+    </div>
 
     <div class="profile-container">
         <h2>Profile Information</h2>
-
+        
         <div class="profile-image">
             <img id="previewImage" src="https://placehold.co/150x150" alt="Profile Photo">
             <input type="file" id="photoInput" accept="image/*">
@@ -470,6 +475,15 @@
                     alert("Error uploading photo.");
                 }
             });
+
+            $('#logoutBtn').click(() => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('id');
+                window.location.href = '/';
+            });
+            
+            $('#backtohome').click(() => window.location.href = '/');
+            $('#gotodashboard').click(() => window.location.href = '/pages/admin_page.html');
         });
     </script>
 

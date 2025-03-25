@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,9 +13,7 @@
             text-align: center;
         }
 
-        h1, h2 {
-            color: #333;
-        }
+        h1, h2 { color: #333; }
 
         button {
             background-color: #007bff;
@@ -28,9 +27,7 @@
             transition: 0.3s;
         }
 
-        button:hover {
-            background-color: #0056b3;
-        }
+        button:hover { background-color: #0056b3; }
 
         table {
             width: 100%;
@@ -48,12 +45,9 @@
             border-bottom: 1px solid #ddd;
         }
 
-        th {
-            background-color: #007bff;
-            color: white;
-        }
+        th { background-color: #007bff; color: white; }
 
-        input[type="text"], input[type="email"], select {
+        input[type="text"], input[type="email"] {
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
@@ -61,13 +55,8 @@
             font-size: 14px;
         }
 
-        input:disabled {
-            background: #e9ecef;
-        }
-
-        .actions button {
-            margin-right: 5px;
-        }
+        input:disabled { background: #e9ecef; }
+        .actions button { margin-right: 5px; }
     </style>
 </head>
 <body>
@@ -87,112 +76,96 @@
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- User rows will be populated here -->
-        </tbody>
+        <tbody></tbody>
     </table>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const id = urlParams.get('id');
+        $(document).ready(async function () {
+            const token = new URLSearchParams(window.location.search).get('token');
+            const id = new URLSearchParams(window.location.search).get('id');
 
-        if (token && id) {
-            localStorage.setItem('token', token);
-            localStorage.setItem('id', id);
-        } else {
-            var usedToken = localStorage.getItem('token');
-            if (!usedToken) {
+            if (token && id) {
+                localStorage.setItem('token', token);
+                localStorage.setItem('id', id);
+            } else if (!localStorage.getItem('token')) {
                 alert("Unauthenticated");
                 window.location.href = '/';
             }
-        }
 
-        fetch('/api/users')
-            .then(response => response.json())
-            .then(users => {
-                const tableBody = document.getElementById('usersTable').getElementsByTagName('tbody')[0];
-                users.forEach(user => {
-                    const row = tableBody.insertRow();
-                    const nameCell = row.insertCell(0);
-                    const emailCell = row.insertCell(1);
-                    const actionCell = row.insertCell(2);
-                    actionCell.classList.add("actions");
-
-                    const nameInput = document.createElement('input');
-                    nameInput.type = 'text';
-                    nameInput.value = user.name;
-                    nameInput.disabled = true;
-
-                    const emailInput = document.createElement('input');
-                    emailInput.type = 'email';
-                    emailInput.value = user.email;
-                    emailInput.disabled = true;
-
-                    nameCell.appendChild(nameInput);
-                    emailCell.appendChild(emailInput);
-
-                    const updateButton = document.createElement('button');
-                    updateButton.textContent = 'Edit';
-                    updateButton.onclick = () => {
-                        if (nameInput.disabled) {
-                            nameInput.disabled = false;
-                            updateButton.textContent = 'Save';
-                        } else {
-                            updateUser(user._id, nameInput.value);
-                            nameInput.disabled = true;
-                            updateButton.textContent = 'Edit';
-                        }
-                    };
-                    actionCell.appendChild(updateButton);
-
-                    const deleteButton = document.createElement('button');
-                    deleteButton.textContent = 'Delete';
-                    deleteButton.style.backgroundColor = "#dc3545";
-                    deleteButton.onclick = () => deleteUser(user._id);
-                    actionCell.appendChild(deleteButton);
-                });
-            })
-            .catch(error => console.error('Error fetching users:', error));
-
-        function updateUser(userId, newName) {
-            fetch(`/api/users/${userId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newName }),
-            })
-            .then(response => response.json())
-            .then(() => {
-                alert("User updated successfully!");
-                location.reload();
-            })
-            .catch(error => console.error('Error updating user:', error));
-        }
-
-        function deleteUser(userId) {
-            if (confirm("Are you sure you want to delete this user?")) {
-                fetch(`/api/users/${userId}`, { method: 'DELETE' })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    location.reload();
-                })
-                .catch(error => console.error('Error deleting user:', error));
+            async function fetchUsers() {
+                try {
+                    const response = await fetch('/api/users');
+                    const users = await response.json();
+                    populateUserTable(users);
+                } catch (error) {
+                    console.error('Error fetching users:', error);
+                }
             }
-        }
 
-        document.getElementById('logoutBtn').addEventListener('click', function() {
-            localStorage.removeItem('token');
-            localStorage.removeItem('id');
-            window.location.href = '/';
-        });
+            function populateUserTable(users) {
+                const tableBody = $('#usersTable tbody');
+                tableBody.empty();
+                users.forEach(user => {
+                    const row = $("<tr></tr>");
+                    const nameInput = $(`<input type='text' value='${user.name}' disabled>`);
+                    const emailInput = $(`<input type='email' value='${user.email}' disabled>`);
+                    const updateButton = $('<button>Edit</button>').click(() => toggleEdit(user._id, nameInput, updateButton));
+                    const deleteButton = $('<button>Delete</button>').css("background-color", "#dc3545").click(() => deleteUser(user._id));
+                    row.append($("<td></td>").append(nameInput));
+                    row.append($("<td></td>").append(emailInput));
+                    row.append($("<td class='actions'></td>").append(updateButton, deleteButton));
+                    tableBody.append(row);
+                });
+            }
 
-        document.getElementById('backtohome').addEventListener('click', function() {
-            window.location.href = '/';
-        });
+            function toggleEdit(userId, nameInput, button) {
+                if (nameInput.prop('disabled')) {
+                    nameInput.prop('disabled', false);
+                    button.text('Save');
+                } else {
+                    updateUser(userId, nameInput.val());
+                    nameInput.prop('disabled', true);
+                    button.text('Edit');
+                }
+            }
 
-        document.getElementById('gotoprofile').addEventListener('click', function() {
-            window.location.href = '/pages/profile_page.html';
+            async function updateUser(userId, newName) {
+                try {
+                    await fetch(`/api/users/${userId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: newName })
+                    });
+                    alert("User updated successfully!");
+                    fetchUsers();
+                } catch (error) {
+                    console.error('Error updating user:', error);
+                }
+            }
+
+            async function deleteUser(userId) {
+                if (confirm("Are you sure you want to delete this user?")) {
+                    try {
+                        const response = await fetch(`/api/users/${userId}`, { method: 'DELETE' });
+                        const data = await response.json();
+                        alert(data.message);
+                        fetchUsers();
+                    } catch (error) {
+                        console.error('Error deleting user:', error);
+                    }
+                }
+            }
+
+            $('#logoutBtn').click(() => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('id');
+                window.location.href = '/';
+            });
+            
+            $('#backtohome').click(() => window.location.href = '/');
+            $('#gotoprofile').click(() => window.location.href = '/pages/profile_page.html');
+            
+            fetchUsers();
         });
     </script>
 </body>
