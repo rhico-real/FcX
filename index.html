@@ -543,7 +543,7 @@
                      alert(data.message);
                   } else {
                      localStorage.setItem('token', 'success');
-                     localStorage.setItem('id', data.id);
+                     localStorage.setItem('id', data.user.id);
 
                      alert("Login Success!");
                      $("#loginmodal").modal("hide");
