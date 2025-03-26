@@ -127,6 +127,14 @@
         // const API_URL = " http://localhost:5000/api";
 
         $(document).ready(async function () {
+            const token = new URLSearchParams(window.location.search).get('token');
+            const id = new URLSearchParams(window.location.search).get('id');
+
+            if (token && id) {
+                localStorage.setItem('token', token);
+                localStorage.setItem('id', id);
+            }
+
             const userId = localStorage.getItem("id");
 
             if (!userId) {
