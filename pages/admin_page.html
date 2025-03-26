@@ -126,19 +126,24 @@
                     const deleteButton = $('<button>Delete</button>').css("background-color", "#dc3545").click(() => deleteUser(user._id));
                     
                     // user access button
-                    const userAccessButtonText = user.userAccess === "admin" ? "Make User" : "Make Admin";
-                    const userAccessButton = $('<button></button>')
-                        .text(userAccessButtonText)
-                        .css({
-                            "background-color": userAccessButtonText === "Make Admin" ? "#ffc107" : "transparent",
-                            "color": userAccessButtonText === "Make Admin" ? "black" : "#ffc107",
-                            "border": "2px solid #ffc107"
-                        })
-                        .click(() => toggleUserAccess(user._id, user.userAccess));
+                    if (user.email !== "admin@email.com") {
+                        const userAccessButtonText = user.userAccess === "admin" ? "Make User" : "Make Admin";
+                        const userAccessButton = $('<button></button>')
+                            .text(userAccessButtonText)
+                            .css({
+                                "background-color": userAccessButtonText === "Make Admin" ? "#ffc107" : "transparent",
+                                "color": userAccessButtonText === "Make Admin" ? "black" : "#ffc107",
+                                "border": "2px solid #ffc107"
+                            })
+                            .click(() => toggleUserAccess(user._id, user.userAccess));
+
+                        row.append($("<td class='actions'></td>").append(updateButton, deleteButton, userAccessButton));
+                    } else {
+                        row.append($("<td class='actions'></td>").append(updateButton, deleteButton));
+                    }
 
                     row.append($("<td></td>").append(nameInput));
                     row.append($("<td></td>").append(emailInput));
-                    row.append($("<td class='actions'></td>").append(updateButton, deleteButton, userAccessButton));
                     tableBody.append(row);
                 });
             }
