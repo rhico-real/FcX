@@ -124,7 +124,10 @@
                     const emailInput = $(`<input type='email' value='${user.email}' disabled>`);
                     const updateButton = $('<button>Edit</button>').click(() => toggleEdit(user._id, nameInput, updateButton));
                     const deleteButton = $('<button>Delete</button>').css("background-color", "#dc3545").click(() => deleteUser(user._id));
-                    
+
+                    row.append($("<td></td>").append(nameInput));
+                    row.append($("<td></td>").append(emailInput));
+
                     // user access button
                     if (user.email !== "admin@email.com") {
                         const userAccessButtonText = user.userAccess === "admin" ? "Make User" : "Make Admin";
@@ -141,9 +144,7 @@
                     } else {
                         row.append($("<td class='actions'></td>").append(updateButton, deleteButton));
                     }
-
-                    row.append($("<td></td>").append(nameInput));
-                    row.append($("<td></td>").append(emailInput));
+                    
                     tableBody.append(row);
                 });
             }
