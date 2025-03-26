@@ -141,10 +141,8 @@
                             .click(() => toggleUserAccess(user._id, user.userAccess));
 
                         row.append($("<td class='actions'></td>").append(updateButton, deleteButton, userAccessButton));
-                    } else {
-                        row.append($("<td class='actions'></td>").append(updateButton, deleteButton));
                     }
-                    
+
                     tableBody.append(row);
                 });
             }
