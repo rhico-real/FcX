@@ -509,9 +509,9 @@
             const authBtn = document.getElementById('authBtn');
 
             if (token) {
-                authBtn.textContent = 'Dashboard';
+                authBtn.textContent = 'Profile';
                 authBtn.onclick = function() {
-                    window.location.href = 'pages/admin_page.html';
+                    window.location.href = 'pages/profile_page.html';
                 };
             } else {
                 authBtn.textContent = 'Login';
@@ -542,12 +542,12 @@
                   if (data.message) {
                      alert(data.message);
                   } else {
-                     localStorage.setItem('token', 'success');
+                     localStorage.setItem('token', data.token);
                      localStorage.setItem('id', data.user.id);
 
                      alert("Login Success!");
                      $("#loginmodal").modal("hide");
-                     window.location.href = "pages/admin_page.html";
+                     window.location.href = "pages/profile_page.html";
                   }
                })
                .catch(error => console.error("Error:", error));

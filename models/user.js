@@ -10,7 +10,8 @@ const UserSchema = new mongoose.Schema({
   billingAddress: {type: String},
   plan: {type: String},
   status: {type: Boolean},
-  photo: {type: String}
+  photo: {type: String},
+  userAccess: {type: String}
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", UserSchema);

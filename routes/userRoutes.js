@@ -110,6 +110,7 @@ router.put("/users/:id", async (req, res) => {
         billingAddress: req.body.billingAddress,
         plan: req.body.plan,
         status: req.body.status,
+        userAccess: req.body.userAccess
       };
 
       console.log(payload);

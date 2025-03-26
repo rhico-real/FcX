@@ -1,263 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Page</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            max-width: 500px;
-            background-color: #f4f4f4;
-        }
-        .profile-container {
-            background: white;
-            padding: 20px 60px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .profile-item {
-            margin-bottom: 15px;
-        }
-        .label {
-            font-weight: bold;
-            display: block;
-        }
-        input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #218838;
-        }
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        select:focus {
-            border-color: #007bff;
-            outline: none;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-        }
-    </style>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <button id="logoutBtn">Logout</button>
-        <button id="backtohome">Back to Home</button>
-        <button id="gotodashboard">Go to Dashboard</button>
-    </div>
-
-    <div class="profile-container">
-        <h2>Profile Information</h2>
-        <div class="profile-item">
-            <label class="label">Full Name:</label>
-            <input type="text" id="name">
-        </div>
-        <div class="profile-item">
-            <label class="label">Account Number:</label>
-            <input type="text" id="accountNumber">
-        </div>
-        <div class="profile-item">
-            <label class="label">Email:</label>
-            <input type="email" id="email" disabled>
-        </div>
-        <div class="profile-item">
-            <label class="label">Contact:</label>
-            <input type="text" id="contact">
-        </div>
-        <div class="profile-item">
-            <label class="label">Billing Address:</label>
-            <input type="text" id="billingAddress">
-        </div>
-        <div class="profile-item">
-            <label class="label">Plan:</label>
-            <select id="plan">
-                <option value="999">999</option>
-                <option value="1999">1999</option>
-            </select>
-        </div>
-        <div class="profile-item">
-            <label class="label">Status:</label>
-            <select id="status">
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
-            </select>
-        </div>
-        <button id="updateBtn">Update Profile</button>
-    </div>
-    <div class="profile-container">
-        <h2>Profile Information</h2>
-        <div class="profile-item">
-            <label class="label">Profile Photo:</label>
-            <input type="file" id="photoUpload" accept="image/jpeg,image/jpg,image/png">
-            <button id="uploadPhotoBtn" style="margin-top: 10px;">Upload Photo</button>
-            <img id="profileImage" src="" alt="Profile Picture" style="max-width: 200px; margin-top: 10px; display: none;">
-        </div>
-    </div>
-
-    <script>
-        const supabaseUrl = 'https://ohoyulauwjfysjmhqxot.supabase.co'
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ob3l1bGF1d2pmeXNqbWhxeG90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTgwNDIsImV4cCI6MjA1ODM5NDA0Mn0.vRg2eB5PwHlwNR-imKn7urcEtP8A7hFNqIrzziC7jLQ'
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey)
-
-        $(document).ready(async function() {
-            $("#uploadPhotoBtn").click(async function() {
-                const fileInput = document.getElementById('photoUpload');
-                const file = fileInput.files[0];
-                const userId = localStorage.getItem("id");
-                
-                if (!file) {
-                    alert('Please select a file first!');
-                    return;
-                }
-
-                // Validate file type
-                const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-                if (!validTypes.includes(file.type)) {
-                    alert('Only JPEG, JPG, and PNG files are allowed!');
-                    return;
-                }
-
-                // Validate file size (5MB = 5 * 1024 * 1024 bytes)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('File size must be less than 5MB!');
-                    return;
-                }
-
-                try {
-                    // Upload file to Supabase Storage
-                    const fileName = `${userId}_${Date.now()}_${file.name}`;
-                    const { data, error } = await supabase.storage
-                        .from('image')
-                        .upload(`profile_photos/${fileName}`, file, {
-                            cacheControl: '3600',
-                            upsert: true
-                        });
-
-                    if (error) throw error;
-
-                    // Get the public URL for the uploaded file
-                    const { data: { publicUrl } } = supabase.storage
-                        .from('image')
-                        .getPublicUrl(`profile_photos/${fileName}`);
-
-                    // Display the uploaded image
-                    const profileImage = document.getElementById('profileImage');
-                    profileImage.src = publicUrl;
-                    profileImage.style.display = 'block';
-
-                    // Update the user profile with the photo URL
-                    const response = await fetch(`/api/users/${userId}`, {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            photoURL: publicUrl
-                        }),
-                    });
-
-                    if (!response.ok) throw new Error("Failed to update profile with photo URL");
-                    alert('Photo uploaded successfully!');
-
-                } catch (error) {
-                    console.error('Error:', error.message);
-                    alert('Error uploading file: ' + error.message);
-                }
-            });
-
-            const userId = localStorage.getItem("id");
-            if (!userId) {
-                alert("User ID not found!");
-                return;
-            }
-
-            // Fetch user details
-            try {
-                const response = await fetch(`/api/users/${userId}`);
-                if (!response.ok) throw new Error("Failed to fetch user");
-                const user = await response.json();
-
-                // Populate fields
-                $("#name").val(user.name);
-                $("#accountNumber").val(user.accountNumber);
-                $("#email").val(user.email);
-                $("#contact").val(user.contact);
-                $("#billingAddress").val(user.billingAddress);
-                $("#plan").val(user.plan ? user.plan.toString() : "999");
-                $("#status").val(user.status !== undefined ? user.status.toString() : "true");
-            } catch (error) {
-                console.error(error);
-                alert("Error loading user data.");
-            }
-
-            // Update user details
-            $("#updateBtn").click(async function() {
-                const updatedUser = {
-                    name: $("#name").val(),
-                    accountNumber: $("#accountNumber").val(),
-                    contact: $("#contact").val(),
-                    billingAddress: $("#billingAddress").val(),
-                    plan: $("#plan").val(),
-                    status: $("#status").val() === "true"
-                };
-
-                try {
-                    const response = await fetch(`/api/users/${userId}`, {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(updatedUser),
-                    });
-
-                    if (!response.ok) throw new Error("Update failed");
-                    alert("Profile updated successfully!");
-                } catch (error) {
-                    console.error(error);
-                    alert("Error updating profile.");
-                }
-            });
-            
-            $("#logoutBtn").click(function() {
-                localStorage.removeItem('token');
-                localStorage.removeItem('id');
-                window.location.href = '/';
-            });
-
-            $("#backtohome").click(async function() {
-                window.location.href = '/';
-            });
-            
-            $("#gotodashboard").click(async function() {
-                window.location.href = '/pages/admin_page.html';
-            });
-        });
-    </script>
-</body>
-</html> -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -324,7 +64,9 @@
     <div>
         <button id="logoutBtn">Logout</button>
         <button id="backtohome">Back to Home</button>
-        <button id="gotodashboard">Go to Dashboard</button>
+        <button id="gotodashboard" style="display: none;">Go to Dashboard</button>
+        <br>
+        <br>
     </div>
 
     <div class="profile-container">
@@ -370,11 +112,19 @@
                 <option value="false">Inactive</option>
             </select>
         </div>
+        <!-- <div class="profile-item">
+            <label class="label">User Access:</label>
+            <select id="useraccess">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div> -->
         <button id="updateBtn">Update Profile</button>
     </div>
 
     <script>
         const API_URL = "https://fcxfibersolutions.onrender.com/api";
+        // const API_URL = " http://localhost:5000/api";
 
         $(document).ready(async function () {
             const userId = localStorage.getItem("id");
@@ -390,6 +140,10 @@
                 const response = await fetch(`${API_URL}/users/${userId}`);
                 if (!response.ok) throw new Error("Failed to fetch user");
                 const user = await response.json();
+                
+                if (user.userAccess && user.userAccess === "admin") {
+                    $("#gotodashboard").show();
+                }
 
                 $("#name").val(user.name);
                 $("#accountNumber").val(user.accountNumber);
@@ -398,6 +152,7 @@
                 $("#billingAddress").val(user.billingAddress);
                 $("#plan").val(user.plan ? user.plan.toString() : "999");
                 $("#status").val(user.status !== undefined ? user.status.toString() : "true");
+                // $("#useraccess").val(user.userAccess !== undefined ? user.userAccess.toString() : "user");
 
                 if (user.photo) {
                     $("#previewImage").attr("src", user.photo);
@@ -415,7 +170,8 @@
                     contact: $("#contact").val(),
                     billingAddress: $("#billingAddress").val(),
                     plan: $("#plan").val(),
-                    status: $("#status").val() === "true"
+                    status: $("#status").val() === "true",
+                    // userAccess: $("#useraccess").val()
                 };
 
                 try {
@@ -427,6 +183,7 @@
 
                     if (!response.ok) throw new Error("Update failed");
                     alert("Profile updated successfully!");
+                    window.location.reload();
                 } catch (error) {
                     console.error(error);
                     alert("Error updating profile.");

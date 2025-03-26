@@ -81,13 +81,26 @@
 
     <script>
         $(document).ready(async function () {
-            const token = new URLSearchParams(window.location.search).get('token');
-            const id = new URLSearchParams(window.location.search).get('id');
+            const API_URL = "https://fcxfibersolutions.onrender.com/api";
+            // const API_URL = " http://localhost:5000/api";
 
-            if (token && id) {
-                localStorage.setItem('token', token);
-                localStorage.setItem('id', id);
-            } else if (!localStorage.getItem('token')) {
+            const token = localStorage.getItem('token');
+            const id = localStorage.getItem('id');
+            
+            const response = await fetch(`${API_URL}/users/${id}`);
+            if (!response.ok){
+                alert("Error fetching user.");
+                window.location.href = '/';
+            };
+
+            const user = await response.json();
+            
+            if (user.userAccess !== "admin") {
+                alert("Admin access only.");
+                window.location.href = '/';
+            }
+
+            if (!token) {
                 alert("Unauthenticated");
                 window.location.href = '/';
             }
@@ -111,11 +124,39 @@
                     const emailInput = $(`<input type='email' value='${user.email}' disabled>`);
                     const updateButton = $('<button>Edit</button>').click(() => toggleEdit(user._id, nameInput, updateButton));
                     const deleteButton = $('<button>Delete</button>').css("background-color", "#dc3545").click(() => deleteUser(user._id));
+                    
+                    // user access button
+                    const userAccessButtonText = user.userAccess === "admin" ? "Make User" : "Make Admin";
+                    const userAccessButton = $('<button></button>')
+                        .text(userAccessButtonText)
+                        .css({
+                            "background-color": userAccessButtonText === "Make Admin" ? "#ffc107" : "transparent",
+                            "color": userAccessButtonText === "Make Admin" ? "black" : "#ffc107",
+                            "border": "2px solid #ffc107"
+                        })
+                        .click(() => toggleUserAccess(user._id, user.userAccess));
+
                     row.append($("<td></td>").append(nameInput));
                     row.append($("<td></td>").append(emailInput));
-                    row.append($("<td class='actions'></td>").append(updateButton, deleteButton));
+                    row.append($("<td class='actions'></td>").append(updateButton, deleteButton, userAccessButton));
                     tableBody.append(row);
                 });
+            }
+
+            async function toggleUserAccess(userId, currentAccess) {
+                const newAccess = currentAccess === "admin" ? "user" : "admin";
+
+                try {
+                    await fetch(`/api/users/${userId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userAccess: newAccess })
+                    });
+                    alert(`User access changed to ${newAccess}!`);
+                    fetchUsers();
+                } catch (error) {
+                    console.error('Error updating user access:', error);
+                }
             }
 
             function toggleEdit(userId, nameInput, button) {
