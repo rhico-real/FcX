@@ -198,10 +198,11 @@
                 }
             });
 
-            // Handle image preview
             $("#photoInput").change(function (event) {
                 const file = event.target.files[0];
-                if (file) {
+                
+                if (validateFile(file, $(this))) {
+                    // Preview the image if valid
                     const reader = new FileReader();
                     reader.onload = function (e) {
                         $("#previewImage").attr("src", e.target.result);
@@ -210,20 +211,24 @@
                 }
             });
 
-            // Upload profile photo
             $("#uploadPhotoBtn").click(async function () {
-                const fileInput = document.querySelector("#photoInput"); // Ensure this matches your input's ID
+                const fileInput = document.querySelector("#photoInput");
+
                 if (!fileInput || !fileInput.files.length) {
-                    console.error("No file selected");
+                    alert("No file selected.");
                     return;
                 }
 
+                const file = fileInput.files[0];
+
+                // Validate file before uploading
+                if (!validateFile(file, $(fileInput))) return;
+
                 const formData = new FormData();
-                formData.append("file", fileInput.files[0]); // Append the first file
-                formData.append("userId", userId);
+                formData.append("file", file);
+                formData.append("userId", localStorage.getItem("id"));
 
                 try {
-                    console.log(formData);
                     console.log([...formData.entries()]);
                     const response = await fetch(`${API_URL}/upload-photo`, {
                         method: "POST",
@@ -242,6 +247,34 @@
                 }
             });
 
+            // Function to validate file type and size
+            function validateFile(file, inputElement) {
+                const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+                const validExtensions = ["jpg", "jpeg", "png"];
+                const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+
+                if (!file) {
+                    alert("No file selected.");
+                    return false;
+                }
+
+                const fileExtension = file.name.split(".").pop().toLowerCase();
+
+                if (!validTypes.includes(file.type) || !validExtensions.includes(fileExtension)) {
+                    alert("Invalid file type. Please upload only Image files.");
+                    inputElement.val(""); // Clear the input field
+                    return false;
+                }
+
+                if (file.size > maxSize) {
+                    alert("File size exceeds 5MB limit. Please upload a smaller file.");
+                    inputElement.val(""); // Clear the input field
+                    return false;
+                }
+
+                return true; // File is valid
+            }
+            
             $('#logoutBtn').click(() => {
                 localStorage.removeItem('token');
                 localStorage.removeItem('id');
